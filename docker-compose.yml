@@ -1,0 +1,23 @@
+version: "2"
+
+services:
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+  web:
+    build:
+      context: .
+      args:
+        - DJANGO_ENV=docker_local
+    command: bash -c "python manage.py makemigrations authenticate --settings=blogapp.docker_local
+                      && python manage.py makemigrations blog --settings=blogapp.docker_local
+                      && python manage.py migrate --settings=blogapp.docker_local
+                      && python manage.py runserver 0.0.0.0:8000 --settings=blogapp.docker_local"
+    volumes:
+      - .:/webapp
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
